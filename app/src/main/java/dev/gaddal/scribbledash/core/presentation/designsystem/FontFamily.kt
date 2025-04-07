@@ -9,6 +9,10 @@ val BagelFatOneFontFamily = FontFamily(
     Font(R.font.bagel_fat_one_regular, FontWeight.Normal),
 )
 
+val OiFontFamily = FontFamily(
+    Font(R.font.oi_regular, FontWeight.Normal),
+)
+
 val OutfitFontFamily = FontFamily(
     Font(R.font.outfit_regular, FontWeight.Normal),
     Font(R.font.outfit_medium, FontWeight.Medium),
