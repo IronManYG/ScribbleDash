@@ -3,4 +3,12 @@
     <string name="app_name">ScribbleDash</string>
     <string name="android">اندرويد</string>
     <string name="hello">مرحباً %1$s!</string>
+    <string name="go_back">ارجع</string>
+    <string name="open_menu">افتح القائمة</string>
+    <string name="settings">الإعدادات</string>
+    <string name="chart">الرسم البياني</string>
+    <string name="home">الرئيسية</string>
+    <string name="one_round_wonder">جولة مدهشة</string>
+    <string name="start_drawing">ابدأ الرسم!</string>
+    <string name="select_game_mode">اختر وضع اللعبة</string>
 </resources>
