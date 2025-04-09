@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">ScribbleDash</string>
+    <string name="app_name">سكربل داش</string>
     <string name="android">اندرويد</string>
     <string name="hello">مرحباً %1$s!</string>
     <string name="go_back">ارجع</string>

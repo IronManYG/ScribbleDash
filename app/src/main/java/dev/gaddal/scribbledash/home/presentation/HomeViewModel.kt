@@ -2,6 +2,7 @@ package dev.gaddal.scribbledash.home.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dev.gaddal.scribbledash.core.presentation.ui.navigation.HomeNavItem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onStart
@@ -27,6 +28,18 @@ class HomeViewModel() : ViewModel() {
 
     fun onAction(action: HomeAction) {
         when (action) {
+            is HomeAction.OnHomeGameModeClick -> {
+                _state.value = _state.value.copy(
+                    currentDestination = HomeNavItem.HomeGameMode
+                )
+            }
+
+            is HomeAction.OnChartClick -> {
+                _state.value = _state.value.copy(
+                    currentDestination = HomeNavItem.Chart
+                )
+            }
+
             else -> {}
         }
     }
