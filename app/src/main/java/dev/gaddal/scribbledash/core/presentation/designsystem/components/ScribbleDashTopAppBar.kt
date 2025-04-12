@@ -51,6 +51,7 @@ import dev.gaddal.scribbledash.core.presentation.designsystem.components.util.Dr
  * - Optional settings button
  * - Expandable dropdown menu
  * - Custom start content (e.g., logo)
+ * - Custom end content (e.g., icons)
  * - Scroll behavior integration
  *
  * @param title The text to display in the app bar's title area
@@ -63,6 +64,7 @@ import dev.gaddal.scribbledash.core.presentation.designsystem.components.util.Dr
  * @param onSettingsClick Callback for when the settings button is clicked
  * @param scrollBehavior Scroll behavior for the app bar
  * @param startContent Optional composable content to display before the title
+ * @param endContent Optional composable content to display after the title
  * @param isTitleCentered Whether to center the title horizontally in the app bar
  * @param titleTextStyle The text style to apply to the title
  */
@@ -78,6 +80,7 @@ fun ScribbleDashTopAppBar(
     onSettingsClick: () -> Unit = {},
     scrollBehavior: TopAppBarScrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(),
     startContent: (@Composable () -> Unit)? = null,
+    endContent: (@Composable () -> Unit)? = null,
     isTitleCentered: Boolean = false,
     titleTextStyle: TextStyle = MaterialTheme.typography.headlineLarge,
 ) {
@@ -144,7 +147,8 @@ fun ScribbleDashTopAppBar(
                                 ) {
                                     Icon(
                                         imageVector = item.icon,
-                                        contentDescription = item.title
+                                        contentDescription = item.title,
+                                        tint = item.iconTint
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(text = item.title)
@@ -168,6 +172,12 @@ fun ScribbleDashTopAppBar(
                             contentDescription = stringResource(id = R.string.settings),
                         )
                     }
+                }
+
+                else -> {
+                    // Optional end content
+                    // Optional end content
+                    endContent?.invoke()
                 }
             }
         },
