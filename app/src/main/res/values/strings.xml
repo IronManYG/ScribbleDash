@@ -24,4 +24,10 @@
     <string name="one_round_wonder">One Round Wonder</string>
     <string name="start_drawing">Start Drawing!</string>
     <string name="select_game_mode">Select game mode</string>
+    <string name="choose_difficulty">Choose a difficulty setting</string>
+    <string name="close">Close</string>
+    <string name="time_to_draw">Time to draw!</string>
+    <string name="beginner">Beginner</string>
+    <string name="challenging">Challenging</string>
+    <string name="master">Master</string>
 </resources>

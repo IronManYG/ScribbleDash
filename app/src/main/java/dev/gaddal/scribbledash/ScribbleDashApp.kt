@@ -2,6 +2,7 @@ package dev.gaddal.scribbledash
 
 import android.app.Application
 import dev.gaddal.scribbledash.di.appModule
+import dev.gaddal.scribbledash.gameModes.di.gameModesPresentationModule
 import dev.gaddal.scribbledash.home.presentation.di.homePresentationModule
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -26,6 +27,7 @@ class ScribbleDashApp : Application() {
             modules(
                 appModule,
                 homePresentationModule,
+                gameModesPresentationModule
             )
         }
     }

@@ -11,4 +11,10 @@
     <string name="one_round_wonder">جولة مدهشة</string>
     <string name="start_drawing">ابدأ الرسم!</string>
     <string name="select_game_mode">اختر وضع اللعبة</string>
+    <string name="choose_difficulty">اختر مستوى الصعوبة</string>
+    <string name="close">إغلاق</string>
+    <string name="time_to_draw">حان وقت الرسم!</string>
+    <string name="beginner">مبتدئ</string>
+    <string name="challenging">تحدي</string>
+    <string name="master">خبير</string>
 </resources>
