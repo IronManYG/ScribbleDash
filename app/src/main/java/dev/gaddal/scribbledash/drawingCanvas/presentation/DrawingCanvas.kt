@@ -15,128 +15,120 @@ import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import dev.gaddal.scribbledash.core.presentation.designsystem.colors.AppColors
 import dev.gaddal.scribbledash.drawingCanvas.domain.CanvasAction
 import dev.gaddal.scribbledash.drawingCanvas.domain.CanvasController
+import kotlin.math.hypot
 
 @Composable
 fun DrawingCanvas(
     canvasController: CanvasController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    strokeWidth: Float, // injected from the selected difficulty
+    touchEnabled: Boolean = true
 ) {
     val state by canvasController.canvasState.collectAsState()
 
+    /* ───────── Pointer handling ───────── */
     Canvas(
         modifier = modifier
             .clipToBounds()
-            .pointerInput(Unit) {
-                // Use awaitPointerEventScope for more granular control
-                awaitPointerEventScope {
-                    var path: MutableList<Offset>? = null
-                    var lastPoint: Offset? = null
+            .then(
+                if (touchEnabled) {
+                    Modifier.pointerInput(Unit) {
+                        awaitPointerEventScope {
+                            var lastPoint: Offset? = null
+                            val coalescePx = 4f       // minimum distance before adding a new point
 
-                    while (true) {
-                        val event = awaitPointerEvent()
-                        val pointer = event.changes.firstOrNull() ?: continue
+                            while (true) {
+                                val event = awaitPointerEvent()
+                                val pointer = event.changes.firstOrNull() ?: continue
 
-                        when {
-                            // Pointer down - start new path
-                            pointer.pressed && !pointer.previousPressed -> {
-                                path = mutableListOf(pointer.position)
-                                lastPoint = pointer.position
-                                canvasController.handleAction(CanvasAction.NewPathStart)
-                                canvasController.handleAction(CanvasAction.Draw(pointer.position))
-                            }
+                                when {
+                                    pointer.pressed && !pointer.previousPressed -> {
+                                        // New path
+                                        lastPoint = pointer.position
+                                        canvasController.handleAction(CanvasAction.NewPathStart)
+                                        canvasController.handleAction(CanvasAction.Draw(pointer.position))
+                                    }
 
-                            // Pointer moved - add to path
-                            pointer.pressed && lastPoint != null -> {
-                                // Always add point regardless of distance for slow movements
-                                canvasController.handleAction(CanvasAction.Draw(pointer.position))
-                                lastPoint = pointer.position
-                            }
+                                    pointer.pressed && lastPoint != null -> {
+                                        val dist = hypot(
+                                            pointer.position.x - lastPoint.x,
+                                            pointer.position.y - lastPoint.y
+                                        )
+                                        if (dist >= coalescePx) {
+                                            canvasController.handleAction(CanvasAction.Draw(pointer.position))
+                                            lastPoint = pointer.position
+                                        }
+                                    }
 
-                            // Pointer up - end path
-                            !pointer.pressed && pointer.previousPressed -> {
-                                canvasController.handleAction(CanvasAction.PathEnd)
-                                path = null
-                                lastPoint = null
+                                    !pointer.pressed && pointer.previousPressed -> {
+                                        canvasController.handleAction(CanvasAction.PathEnd)
+                                        lastPoint = null
+                                    }
+                                }
+                                pointer.consume()
                             }
                         }
-
-                        // Important: consume the pointer event to avoid conflicts
-                        pointer.consume()
                     }
+                } else {
+                    Modifier // No pointer input when disabled
                 }
-            }
+            )
     ) {
-        drawGridLines(color = AppColors.OnSurfaceVariant)
+        drawGridLines(color = AppColors.OnSurfaceVariant, density = this)
 
         // Draw completed paths
-        state.paths.fastForEach { pathData ->
-            drawPath(
-                path = pathData.path,
-                color = pathData.color,
-            )
-        }
+        state.paths.fastForEach { drawSmoothedPath(it.path, it.color, strokeWidth) }
 
-        // Draw current path
+        // Draw current in-progress path
         state.currentPath?.let {
-            drawPath(
-                path = it.path,
-                color = it.color
-            )
+            drawSmoothedPath(it.path, it.color, strokeWidth)
         }
     }
 }
 
-private fun DrawScope.drawPath(
-    path: List<Offset>,
+/* ───────── Drawing helpers ───────── */
+
+fun DrawScope.drawSmoothedPath(
+    points: List<Offset>,
     color: Color,
-    thickness: Float = 10f
+    thickness: Float
 ) {
-    if (path.isEmpty()) return
+    if (points.isEmpty()) return
 
-    val smoothedPath = Path().apply {
-        if (path.size == 1) {
-            // For single points, draw a circle
-            addOval(
-                oval = Rect(
-                    center = path.first(),
-                    radius = thickness / 2
-                )
-            )
+    // Build Catmull-Rom spline → cubic Bézier once per frame.
+    val path = Path().apply {
+        if (points.size == 1) {
+            addOval(Rect(center = points.first(), radius = thickness / 2))
         } else {
-            // Start path
-            moveTo(path.first().x, path.first().y)
+            moveTo(points.first().x, points.first().y)
+            for (i in 0 until points.size - 1) {
+                val p0 = if (i > 0) points[i - 1] else points[0]
+                val p1 = points[i]
+                val p2 = points[i + 1]
+                val p3 = if (i < points.size - 2) points[i + 2] else p2
 
-            if (path.size == 2) {
-                // For only two points, draw a straight line
-                lineTo(path.last().x, path.last().y)
-            } else {
-                // For 3+ points, use Catmull-Rom spline for smoother curves
-                for (i in 0 until path.size - 1) {
-                    val p0 = if (i > 0) path[i - 1] else path[0]
-                    val p1 = path[i]
-                    val p2 = path[i + 1]
-                    val p3 = if (i < path.size - 2) path[i + 2] else p2
-
-                    // Catmull-Rom to Cubic Bezier conversion
-                    val tension = 0.1f // Controls curve tightness (0.0-1.0)
-
-                    val cp1x = p1.x + (p2.x - p0.x) * tension / 6
-                    val cp1y = p1.y + (p2.y - p0.y) * tension / 6
-                    val cp2x = p2.x - (p3.x - p1.x) * tension / 6
-                    val cp2y = p2.y - (p3.y - p1.y) * tension / 6
-
-                    cubicTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y)
-                }
+                val tension = 0.1f
+                val cp1 = Offset(
+                    x = p1.x + (p2.x - p0.x) * tension / 6f,
+                    y = p1.y + (p2.y - p0.y) * tension / 6f
+                )
+                val cp2 = Offset(
+                    x = p2.x - (p3.x - p1.x) * tension / 6f,
+                    y = p2.y - (p3.y - p1.y) * tension / 6f
+                )
+                cubicTo(cp1.x, cp1.y, cp2.x, cp2.y, p2.x, p2.y)
             }
         }
     }
 
     drawPath(
-        path = smoothedPath,
+        path = path,
         color = color,
         style = Stroke(
             width = thickness,
@@ -146,24 +138,25 @@ private fun DrawScope.drawPath(
     )
 }
 
-private fun DrawScope.drawGridLines(color: Color) {
+fun DrawScope.drawGridLines(color: Color, density: Density) {
+    val strokePx = with(density) { 1.dp.toPx() }
     val stepX = size.width / 3
     val stepY = size.height / 3
 
     for (i in 1..2) {
-        // Draw vertical lines
+        // vertical
         drawLine(
             color = color,
-            start = Offset(x = stepX * i, y = 0f),
-            end = Offset(x = stepX * i, y = size.height),
-            strokeWidth = 2f
+            start = Offset(stepX * i, 0f),
+            end = Offset(stepX * i, size.height),
+            strokeWidth = strokePx
         )
-        // Draw horizontal lines
+        // horizontal
         drawLine(
             color = color,
-            start = Offset(x = 0f, y = stepY * i),
-            end = Offset(x = size.width, y = stepY * i),
-            strokeWidth = 2f
+            start = Offset(0f, stepY * i),
+            end = Offset(size.width, stepY * i),
+            strokeWidth = strokePx
         )
     }
 }
