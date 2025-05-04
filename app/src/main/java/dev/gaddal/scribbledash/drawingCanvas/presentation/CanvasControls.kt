@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -26,8 +27,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
+import dev.gaddal.scribbledash.R
 import dev.gaddal.scribbledash.core.presentation.designsystem.AppIcons
 import dev.gaddal.scribbledash.core.presentation.designsystem.colors.AppColors
 import dev.gaddal.scribbledash.core.presentation.designsystem.components.ScribbleDashButton
@@ -49,7 +52,8 @@ fun ColumnScope.CanvasControls(
         Color.Gray,
         Color.White
     ),
-    showColorControls: Boolean = true
+    showColorControls: Boolean = true,
+    actionButton: @Composable (() -> Unit)? = null
 ) {
     val state by canvasController.canvasState.collectAsState()
 
@@ -87,7 +91,7 @@ fun ColumnScope.CanvasControls(
 
     Row(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceAround,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Button(
@@ -130,17 +134,23 @@ fun ColumnScope.CanvasControls(
             )
         }
 
-        Surface(
-            shape = RoundedCornerShape(20.dp),
-            color = Color.Transparent,
-            shadowElevation = 24.dp,
-        ) {
-            ScribbleDashButton(
-                onClick = { canvasController.handleAction(CanvasAction.ClearCanvas) },
-                enabled = state.paths.isNotEmpty(),
-                modifier = Modifier.weight(1f),
-                title = "Clear Canvas",
-            )
+        Spacer(modifier = Modifier.weight(1f))
+
+        if (actionButton != null) {
+            actionButton()
+        } else {
+            Surface(
+                shape = RoundedCornerShape(20.dp),
+                color = Color.Transparent,
+                shadowElevation = 24.dp,
+            ) {
+                ScribbleDashButton(
+                    onClick = { canvasController.handleAction(CanvasAction.ClearCanvas) },
+                    enabled = state.paths.isNotEmpty(),
+                    modifier = Modifier.weight(1f),
+                    title = stringResource(R.string.clear_canvas),
+                )
+            }
         }
     }
 }

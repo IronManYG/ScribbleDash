@@ -52,7 +52,10 @@ fun HomeBottomBar(
                     }
                 },
                 colors = NavigationBarItemDefaults.colors().copy(
-                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                    selectedIconColor = when (item.route) {
+                        is HomeNavItem.Chart -> MaterialTheme.colorScheme.tertiary
+                        else -> MaterialTheme.colorScheme.primary
+                    },
                     selectedIndicatorColor = MaterialTheme.colorScheme.surface,
                     unselectedIconColor = AppColors.SurfaceLow,
                 )

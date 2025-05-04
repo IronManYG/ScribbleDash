@@ -2,6 +2,12 @@
 
 package dev.gaddal.scribbledash.gameModes.oneRoundWonder.presentation
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -25,6 +31,7 @@ import dev.gaddal.scribbledash.drawingCanvas.data.DefaultCanvasController
 import dev.gaddal.scribbledash.drawingCanvas.domain.CanvasController
 import dev.gaddal.scribbledash.gameModes.oneRoundWonder.presentation.components.CanvasDrawingSection
 import dev.gaddal.scribbledash.gameModes.oneRoundWonder.presentation.components.DifficultyLevel
+import dev.gaddal.scribbledash.gameModes.oneRoundWonder.presentation.components.ResultScreen
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -55,6 +62,8 @@ fun OneRoundWonderScreen(
     canvasController: CanvasController,
     onAction: (OneRoundWonderAction) -> Unit,
 ) {
+    val animationDuration = 300
+
     ScribbleDashScaffold(
         withGradient = false,
         topAppBar = {
@@ -63,7 +72,12 @@ fun OneRoundWonderScreen(
                 showBackButton = false,
                 showSettingsButton = false,
                 endContent = {
-                    IconButton(onClick = { onAction(OneRoundWonderAction.OnCloseClick) }) {
+                    IconButton(
+                        onClick = {
+                            onAction(OneRoundWonderAction.OnCloseClick)
+                            canvasController.clearCanvas()
+                        }
+                    ) {
                         Icon(
                             imageVector = AppIcons.CloseCircle,
                             contentDescription = stringResource(id = R.string.close),
@@ -78,21 +92,74 @@ fun OneRoundWonderScreen(
             )
         },
     ) { innerPadding ->
-        if (state.level == null) {
+        val slideInAnimation = slideInHorizontally(
+            initialOffsetX = { fullWidth -> -fullWidth },
+            animationSpec = tween(durationMillis = animationDuration)
+        ) + fadeIn(animationSpec = tween(durationMillis = animationDuration))
+
+        val slideOutAnimation = slideOutHorizontally(
+            targetOffsetX = { fullWidth -> -fullWidth },
+            animationSpec = tween(durationMillis = animationDuration)
+        ) + fadeOut(animationSpec = tween(durationMillis = animationDuration))
+
+        val strokeWidth = when (state.level) {
+            Level.Beginner -> 15f
+            Level.Challenging -> 7f
+            Level.Master -> 4f
+            null -> 15f
+        }
+
+        AnimatedVisibility(
+            visible = state.level == null,
+            enter = slideInAnimation,
+            exit = slideOutAnimation
+        ) {
             DifficultyLevel(
                 onLevelClick = { onAction(OneRoundWonderAction.OnLevelClick(it)) },
                 modifier = Modifier.padding(innerPadding)
             )
-        } else {
-            // Canvas Drawing
-            CanvasDrawingSection(
-                canvasController = canvasController,
-                modifier = Modifier.padding(innerPadding)
-            )
         }
 
+        AnimatedVisibility(
+            visible = state.level != null,
+            enter = slideInAnimation,
+            exit = slideOutAnimation
+        ) {
+            AnimatedVisibility(
+                visible = !state.showResult,
+                enter = slideInAnimation,
+                exit = slideOutAnimation
+            ) {
+                CanvasDrawingSection(
+                    canvasController = canvasController,
+                    modifier = Modifier.padding(innerPadding),
+                    referenceDrawingResId = state.referenceResId,
+                    strokeWidth = strokeWidth,
+                    onDoneClick = { onAction(OneRoundWonderAction.OnDoneClick) }
+                )
+            }
+
+            AnimatedVisibility(
+                visible = state.showResult,
+                enter = slideInAnimation,
+                exit = slideOutAnimation
+            ) {
+                ResultScreen(
+                    score = state.score,
+                    referenceResId = state.referenceResId,
+                    canvasController = canvasController,
+                    innerPadding = innerPadding,
+                    strokeWidth = strokeWidth,
+                    onTryAgainClick = {
+                        onAction(OneRoundWonderAction.OnTryAgainClick)
+                        canvasController.clearCanvas()
+                    }
+                )
+            }
+        }
     }
 }
+
 
 @Preview
 @Composable

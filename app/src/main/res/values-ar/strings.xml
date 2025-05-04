@@ -17,4 +17,54 @@
     <string name="beginner">مبتدئ</string>
     <string name="challenging">تحدي</string>
     <string name="master">خبير</string>
+
+    <!--  Oops - Meh Feedback  -->
+    <string name="feedback_oops_1">يبدو أن بيكاسو كان يمر بيوم عصيب!</string>
+    <string name="feedback_oops_2">هل هذا رسم أم بيان فن حديث؟ على أي حال، أنا مرتبك!</string>
+    <string name="feedback_oops_3">لم أكن أعلم أن رسومات العصا يمكن أن تحمل مشاعر عميقة!</string>
+    <string name="feedback_oops_4">هذا ما يحدث عندما تدع قطة تمسك بالقلم!</string>
+    <string name="feedback_oops_5">هل استخدمت البطاطا كمصدر إلهام؟ لأن هذا الرسم مذهل بطريقة طريفة!</string>
+    <string name="feedback_oops_6">لو كانت هذه خريطة كنز، لكنت تائهاً بالتأكيد!</string>
+    <string name="feedback_oops_7">أرى أنك تتجه نحو المظهر \'التجريدي\'. مهمة ناجحة!</string>
+    <string name="feedback_oops_8">هل هذا رسم أم لعبة بيكشنري ذهبت في الاتجاه الخاطئ؟</string>
+    <string name="feedback_oops_9">يمكنني رؤية المجهود… بجانب الارتباك مباشرة!</string>
+    <string name="feedback_oops_10">هذه التحفة مقدمة لك من حرف \'و\' من \'ما هذا؟\'</string>
+    <!--  Good - Great Feedback  -->
+    <string name="feedback_good_1">ليس سيئاً! بضع جلسات تدريب أخرى وقد تنافس بيكاسو!</string>
+    <string name="feedback_good_2">اقتربت من الهدف! مع قليل من الممارسة، ستكون فان جوخ القادم - بدون حادثة الأذن!</string>
+    <string name="feedback_good_3">مجهود جيد! فقط تذكر، حتى أفضل الفنانين كانت لديهم أيام \'عادية\'!</string>
+    <string name="feedback_good_4">محاولة متينة! فكر في هذا كرسم تحضيري للعظمة!</string>
+    <string name="feedback_good_5">أنت على الطريق الصحيح! بضع ضربات أخرى وستصبح أسطورة!</string>
+    <string name="feedback_good_6">محاولة جيدة! مع قليل من الممارسة، ستصبح محترفاً في وقت قريب!</string>
+    <string name="feedback_good_7">بداية رائعة! فقط تذكر، كل تحفة فنية تبدأ بقليل من الفوضى!</string>
+    <string name="feedback_good_8">ليس سيئاً على الإطلاق! استمر، وقريباً ستصبح حديث عالم الفن!</string>
+    <string name="feedback_good_9">عمل جيد! فكر في هذا كخطوة نحو مستقبلك المهني في الفن!</string>
+    <string name="feedback_good_10">لديك إمكانات! مع القليل من الرسم الإضافي، ستصبح لا يوقفك شيء!</string>
+    <!--  Woohoo Feedback  -->
+    <string name="feedback_woohoo_1">واو، هل استدعيت روح مايكل أنجلو للتو؟</string>
+    <string name="feedback_woohoo_2">هذا جيد جداً، أنا مقتنع أن لديك شهادة فنية سرية!</string>
+    <string name="feedback_woohoo_3">لو كانت هذه منافسة، لكنت البطل المتوج بالروعة!</string>
+    <string name="feedback_woohoo_4">هل هذا رسم أم بوابة إلى بعد آخر؟ لأنني مستعد للخطوة عبرها!</string>
+    <string name="feedback_woohoo_5">لقد رفعت المستوى رسمياً! سأحتاج إلى سلم للوصول إليه!</string>
+    <string name="feedback_woohoo_6">هذا مثير للإعجاب لدرجة أنني متأكد من أنه أصبح الموناليزا الجديدة!</string>
+    <string name="feedback_woohoo_7">لو كان هذا طعاماً، لكان وجبة فاخرة - فنية بشكل لذيذ!</string>
+    <string name="feedback_woohoo_8">لديك مهارات! بدأت أعتقد أنك قد تكون ساحراً بهذا القلم!</string>
+    <string name="feedback_woohoo_9">هذا الرسم يستحق نادي معجبين خاص به! هل يمكنني أن أكون الرئيس؟</string>
+    <string name="feedback_woohoo_10">هل هناك معرض قريب؟ لأن هذه التحفة تحتاج إلى العرض!</string>
+
+    <string name="clear_canvas">مسح اللوحة</string>
+    <string name="ready_set">استعد، تأهب…</string>
+    <string name="example">مثال</string>
+    <string name="your_drawing">رسمتك</string>
+    <string name="seconds_left">%1$s ثانية متبقية</string>
+    <string name="done">انتهى!</string>
+    <string name="rating_woohoo">رائع!</string>
+    <string name="rating_great">ممتاز</string>
+    <string name="rating_good">جيد</string>
+    <string name="rating_meh">مقبول</string>
+    <string name="rating_oops">عفواً</string>
+    <string name="drawing">الرسم</string>
+    <string name="try_again">حاول مجدداً</string>
+    <string name="stat_track_empty">لا يوجد شيء لتتبعه… حتى الآن</string>
+    <string name="statistics">الإحصائيات</string>
 </resources>
