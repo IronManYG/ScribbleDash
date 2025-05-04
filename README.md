@@ -13,25 +13,62 @@
 
 ## Overview
 
-**ScribbleDash** is an Android app designed to let you freely draw on a digital canvas while incorporating fun game modes. Whether you want to doodle casually or challenge yourself with specific modes, you’ll have access to intuitive undo/redo controls, a clean canvas, and a simple UI. The initial milestone focuses on a single mode (One Round Wonder), but this README anticipates an expandable architecture to accommodate future modes.
+**ScribbleDash** is an Android app designed to let you freely draw on a digital canvas while incorporating fun game modes. Whether you want to doodle casually or challenge yourself with specific modes, you’ll have access to intuitive undo/redo controls, a clean canvas, and a simple UI. Also its lets you draw on a digital canvas and compete in fast **memory‑sketch** rounds. With **Milestone 2** the project evolves from a sandbox into a fully scored game loop:
+
+1. Pick **One Round Wonder** on the Home screen.
+2. Choose a difficulty (brush thickness scales with difficulty).
+3. Memorize the reference image shown during a 3‑second countdown.
+4. Redraw the image from memory.
+5. Tap **Done**—a pixel‑by‑pixel comparison algorithm rates your accuracy.
+6. View your score, read playful feedback, and dive right back in.
 
 ## Features
 
--   **Home Screen**
-    -   Displays app title and available game modes (with placeholders for future modes)
-    -   Bottom navigation bar (one tab for Home, another reserved for future milestones)
--   **Game Modes**
-    -   **One Round Wonder**
-        -   Difficulty selection screen (Beginner, Challenging, Master)
-        -   Tapping any difficulty sends you straight into the drawing canvas
--   **Drawing Canvas**
-    -   1:1 aspect ratio canvas with grid background
-    -   **Undo/Redo** up to 5 recent strokes
-    -   **Clear Canvas** to remove all paths
-    -   Close icon to return to the Home screen
--   **Future Navigation**
-    -   Additional modes will slot into a dedicated `gamemodes` package structure
-    -   Potential for advanced drawing features, timed challenges, or multiplayer modes
+### Home Screen
+
+* App title and list of available modes.
+* Bottom navigation with **Home** and **Statistics**.
+
+### Statistics Screen *(new in Milestone 2)*
+
+* Static mock‑up that will evolve into full leaderboards.
+* Placeholder cards for score history and accuracy distribution.
+
+### Game Modes
+
+| Mode                 | Highlights in Milestone 2                                                                                                                                                                                                                                                                                            |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **One Round Wonder** | • Difficulty picker (Beginner ×15, Challenging ×7, Master ×4).• **Preview**—fullscreen reference with “Ready, set …” countdown.• **Draw Mode**—1 : 1 grid canvas, undo/redo stack (×5), **Done** button.• **Results**—side‑by‑side canvases, score %, rating badge (Oops → Woohoo!), random feedback, **Try Again**. |
+
+> Additional modes will live under `features/gamemodes/*` without impacting existing code.
+
+### Drawing Canvas
+
+* Fixed 1 : 1 surface with a nine‑square grid background.
+* Default stroke width = 4 dp (scaled only for comparison).
+* Undo ⟲ / Redo ⟳ (up to 5), Clear, and **Done**.
+* Close icon returns to Home—system‑back is disabled on the Results screen.
+
+### Accuracy Algorithm
+
+```text
+Final Score (%) = Coverage (%) − MissingLengthPenalty (%)
+```
+
+1. Parse SVGs into `Path` data (cached on app start).
+2. Clone example paths with a thicker stroke based on difficulty.
+3. Normalize both drawings (translate to origin, scale to canvas).
+4. Rasterize to two transparent bitmaps.
+5. Coverage = matching pixels ÷ visible user pixels.
+6. If user‑path length < 70 % of example, deduct the missing percent.
+
+| Score  | Rating  |
+| ------ | ------- |
+| 0–39   | Oops    |
+| 40–69  | Meh     |
+| 70–79  | Good    |
+| 80–89  | Great   |
+| 90–100 | Woohoo! |
 
 ## Screenshots
 
