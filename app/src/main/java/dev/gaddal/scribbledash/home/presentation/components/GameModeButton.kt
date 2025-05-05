@@ -11,10 +11,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import dev.gaddal.scribbledash.R
 import dev.gaddal.scribbledash.core.domain.gameMode.GameMode
 import dev.gaddal.scribbledash.core.presentation.designsystem.ScribbleDashTheme
 import dev.gaddal.scribbledash.core.presentation.designsystem.colors.AppColors
@@ -27,7 +28,7 @@ fun GameModeButton(
     backgroundColor: Color,
     onClick: (GameMode) -> Unit,
     title: String,
-    image: ImageVector
+    image: Painter
 ) {
     ScribbleDashButton(
         modifier = modifier,
@@ -50,7 +51,7 @@ fun GameModeButton(
                 style = MaterialTheme.typography.headlineMedium
             )
             Image(
-                imageVector = image,
+                painter = image,
                 contentDescription = null,
                 alignment = Alignment.CenterEnd,
                 modifier = Modifier.weight(1f)
@@ -70,7 +71,7 @@ private fun GameModeButtonPreview() {
             backgroundColor = AppColors.SuccessGreen,
             onClick = {},
             title = gameMode.name.asString(),
-            image = ImageVector.vectorResource(id = gameMode.imageResId)
+            image = painterResource(id = R.drawable.one_round_wonder)
         )
     }
 }

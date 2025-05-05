@@ -12,9 +12,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dev.gaddal.scribbledash.R
@@ -66,7 +65,7 @@ fun GameModeSection(
                         )
                     },
                     title = gameMode.name.asString(),
-                    image = ImageVector.vectorResource(id = gameMode.imageResId)
+                    image = painterResource(id = gameMode.imageResId)
                 )
             }
         }

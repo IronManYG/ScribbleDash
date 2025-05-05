@@ -1,5 +1,10 @@
 package dev.gaddal.scribbledash.navigation
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Text
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
@@ -19,6 +24,8 @@ fun NavGraphBuilder.homeNavGraph(navController: NavHostController) {
                 onGameModeClick = { gameMode ->
                     when (gameMode) {
                         GameMode.OneRoundWonder -> navController.navigate(HomeNavItem.OneRoundWonder)
+                        GameMode.SpeedDraw -> navController.navigate(HomeNavItem.SpeedDraw)
+                        GameMode.EndlessMode -> navController.navigate(HomeNavItem.EndlessMode)
                     }
                 }
             )
@@ -28,6 +35,22 @@ fun NavGraphBuilder.homeNavGraph(navController: NavHostController) {
                 onCloseClick = { navController.popBackStack() },
                 onLevelClick = {}
             )
+        }
+        composable<HomeNavItem.SpeedDraw> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = "Speed Draw")
+            }
+        }
+        composable<HomeNavItem.EndlessMode> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = "Endless Mode")
+            }
         }
     }
 }

@@ -15,4 +15,10 @@ sealed class HomeNavItem : Screen() {
     // Game modes
     @Serializable
     data object OneRoundWonder : HomeNavItem()
+
+    @Serializable
+    data object SpeedDraw : HomeNavItem()
+
+    @Serializable
+    data object EndlessMode : HomeNavItem()
 }

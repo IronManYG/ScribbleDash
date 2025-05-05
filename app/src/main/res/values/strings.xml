@@ -79,4 +79,6 @@
     <string name="try_again">TRY AGAIN</string>
     <string name="stat_track_empty">Nothing to track…for now</string>
     <string name="statistics">Statistics</string>
+    <string name="speed_draw">Speed Draw</string>
+    <string name="endless_mode">Endless Mode</string>
 </resources>
