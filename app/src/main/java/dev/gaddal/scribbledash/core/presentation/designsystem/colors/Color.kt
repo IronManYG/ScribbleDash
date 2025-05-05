@@ -28,4 +28,7 @@ object AppColors {
 
     val OnSurface = Color(0xFFA5978A)
     val OnSurfaceVariant = Color(0xFFF6F1EC)
+
+    val Shadow = Color(0xFF726558)
+    val Shadow_SL12 = Shadow.copy(alpha = 0.12f) // Shadow / opacity - 0.08
 }
