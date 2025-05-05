@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import dev.gaddal.scribbledash.R
 import dev.gaddal.scribbledash.core.domain.gameMode.GameMode.Companion.allGameModes
 import dev.gaddal.scribbledash.core.presentation.designsystem.ScribbleDashTheme
-import dev.gaddal.scribbledash.core.presentation.designsystem.colors.AppColors
+import dev.gaddal.scribbledash.core.presentation.designsystem.components.util.dropShadow
 import dev.gaddal.scribbledash.home.presentation.HomeAction
 
 
@@ -48,9 +49,22 @@ fun GameModeSection(
         ) {
             items(allGameModes) { gameMode ->
                 GameModeButton(
+                    modifier = Modifier
+                        .dropShadow(
+                            shape = RoundedCornerShape(16.dp),
+                            color = gameMode.shadowColor,
+                            blur = 4.dp,
+                            offsetY = 2.dp,
+                        ),
                     gameMode = gameMode,
-                    backgroundColor = AppColors.SuccessGreen,
-                    onClick = { gameMode -> onAction(HomeAction.OnGameModeClick(gameMode)) },
+                    backgroundColor = gameMode.backgroundColor,
+                    onClick = { selectedGameMode ->
+                        onAction(
+                            HomeAction.OnGameModeClick(
+                                selectedGameMode
+                            )
+                        )
+                    },
                     title = gameMode.name.asString(),
                     image = ImageVector.vectorResource(id = gameMode.imageResId)
                 )

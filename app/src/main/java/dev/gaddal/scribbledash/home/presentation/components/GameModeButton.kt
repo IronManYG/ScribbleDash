@@ -22,6 +22,7 @@ import dev.gaddal.scribbledash.core.presentation.designsystem.components.Scribbl
 
 @Composable
 fun GameModeButton(
+    modifier: Modifier = Modifier,
     gameMode: GameMode,
     backgroundColor: Color,
     onClick: (GameMode) -> Unit,
@@ -29,6 +30,7 @@ fun GameModeButton(
     image: ImageVector
 ) {
     ScribbleDashButton(
+        modifier = modifier,
         onClick = { onClick(gameMode) },
         backgroundColor = backgroundColor,
         containerColor = MaterialTheme.colorScheme.surface,
@@ -62,7 +64,7 @@ fun GameModeButton(
 private fun GameModeButtonPreview() {
     ScribbleDashTheme {
         // Assuming the first game mode for preview
-        val gameMode = GameMode.Companion.allGameModes.firstOrNull() ?: return@ScribbleDashTheme
+        val gameMode = GameMode.allGameModes.firstOrNull() ?: return@ScribbleDashTheme
         GameModeButton(
             gameMode = gameMode,
             backgroundColor = AppColors.SuccessGreen,

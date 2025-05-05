@@ -16,12 +16,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dev.gaddal.scribbledash.core.presentation.designsystem.ScribbleDashTheme
 import dev.gaddal.scribbledash.core.presentation.designsystem.colors.AppColors
+import dev.gaddal.scribbledash.core.presentation.designsystem.components.util.dropShadow
 
 @Composable
 fun ScribbleDashButton(
+    modifier: Modifier = Modifier,
     onClick: () -> Unit,
     enabled: Boolean = true,
-    modifier: Modifier = Modifier,
     backgroundColor: Color = MaterialTheme.colorScheme.surface,
     containerColor: Color = AppColors.SuccessGreen,
     contentColor: Color = MaterialTheme.colorScheme.onPrimary,
@@ -38,6 +39,11 @@ fun ScribbleDashButton(
 ) {
     Box(
         modifier = Modifier
+            .dropShadow(
+                shape = RoundedCornerShape(20.dp),
+                blur = 24.dp,
+                offsetY = 8.dp,
+            )
             .background(
                 color = backgroundColor,
                 shape = RoundedCornerShape(20.dp)
@@ -45,7 +51,9 @@ fun ScribbleDashButton(
     ) {
         Button(
             onClick = onClick,
-            modifier = modifier.padding(6.dp),
+            modifier = Modifier
+                .padding(6.dp)
+                .then(modifier),
             enabled = enabled,
             shape = RoundedCornerShape(16.dp),
             colors = ButtonDefaults.buttonColors().copy(
@@ -68,7 +76,7 @@ fun ScribbleDashButton(
     }
 }
 
-@Preview()
+@Preview(showBackground = true)
 @Composable
 fun ScribbleDashButtonPreview() {
     ScribbleDashTheme {

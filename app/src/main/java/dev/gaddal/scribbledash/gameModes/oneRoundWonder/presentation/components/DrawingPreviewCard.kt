@@ -23,6 +23,7 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import dev.gaddal.scribbledash.core.presentation.designsystem.colors.AppColors
+import dev.gaddal.scribbledash.core.presentation.designsystem.components.util.dropShadow
 import dev.gaddal.scribbledash.drawingCanvas.presentation.drawGridLines
 
 @Composable
@@ -46,11 +47,15 @@ fun DrawingPreviewCard(
 
         Surface(
             modifier = Modifier
+                .dropShadow(
+                    shape = RoundedCornerShape(36.dp),
+                    blur = 24.dp,
+                    offsetY = 8.dp,
+                )
                 .size(160.dp)
                 .aspectRatio(1f),
             shape = RoundedCornerShape(36.dp),
             color = MaterialTheme.colorScheme.surface,
-            shadowElevation = 24.dp,
         ) {
             Box(
                 modifier = Modifier

@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import dev.gaddal.scribbledash.core.domain.gameMode.Level
 import dev.gaddal.scribbledash.core.presentation.designsystem.ScribbleDashTheme
 import dev.gaddal.scribbledash.core.presentation.designsystem.colors.AppColors
+import dev.gaddal.scribbledash.core.presentation.designsystem.components.util.dropShadow
 
 @Composable
 fun GameLevelButton(
@@ -38,13 +39,16 @@ fun GameLevelButton(
     ) {
         Button(
             onClick = { onClick(level) },
-            modifier = Modifier.size(88.dp),
+            modifier = Modifier
+                .size(88.dp)
+                .dropShadow(
+                    shape = CircleShape,
+                    blur = 24.dp,
+                    offsetY = 8.dp,
+                ),
             shape = CircleShape,
             colors = ButtonDefaults.buttonColors().copy(
                 containerColor = MaterialTheme.colorScheme.surface,
-            ),
-            elevation = ButtonDefaults.buttonElevation(
-                defaultElevation = 32.dp,
             ),
             contentPadding = PaddingValues(0.dp),
         ) {

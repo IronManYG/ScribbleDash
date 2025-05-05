@@ -18,7 +18,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -139,18 +138,11 @@ fun ColumnScope.CanvasControls(
         if (actionButton != null) {
             actionButton()
         } else {
-            Surface(
-                shape = RoundedCornerShape(20.dp),
-                color = Color.Transparent,
-                shadowElevation = 24.dp,
-            ) {
-                ScribbleDashButton(
-                    onClick = { canvasController.handleAction(CanvasAction.ClearCanvas) },
-                    enabled = state.paths.isNotEmpty(),
-                    modifier = Modifier.weight(1f),
-                    title = stringResource(R.string.clear_canvas),
-                )
-            }
+            ScribbleDashButton(
+                onClick = { canvasController.handleAction(CanvasAction.ClearCanvas) },
+                enabled = state.paths.isNotEmpty(),
+                title = stringResource(R.string.clear_canvas),
+            )
         }
     }
 }

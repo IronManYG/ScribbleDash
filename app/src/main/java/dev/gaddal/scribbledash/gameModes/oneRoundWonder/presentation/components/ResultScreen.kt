@@ -12,9 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -23,7 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -121,19 +118,13 @@ fun ResultScreen(
         Spacer(modifier = Modifier.weight(1f))
 
         // Try again button
-        Surface(
-            shape = RoundedCornerShape(20.dp),
-            color = Color.Transparent,
-            shadowElevation = 24.dp,
-        ) {
-            ScribbleDashButton(
-                onClick = onTryAgainClick,
-                enabled = true,
-                modifier = Modifier.fillMaxWidth(),
-                containerColor = MaterialTheme.colorScheme.primary,
-                title = stringResource(R.string.try_again),
-            )
-        }
+        ScribbleDashButton(
+            onClick = onTryAgainClick,
+            enabled = true,
+            modifier = Modifier.fillMaxWidth(),
+            containerColor = MaterialTheme.colorScheme.primary,
+            title = stringResource(R.string.try_again),
+        )
 
         Spacer(modifier = Modifier.height(32.dp))
     }

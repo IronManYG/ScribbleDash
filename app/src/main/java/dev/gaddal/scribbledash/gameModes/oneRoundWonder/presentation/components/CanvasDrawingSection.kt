@@ -27,7 +27,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -38,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import dev.gaddal.scribbledash.R
 import dev.gaddal.scribbledash.core.presentation.designsystem.ScribbleDashTheme
 import dev.gaddal.scribbledash.core.presentation.designsystem.components.ScribbleDashButton
+import dev.gaddal.scribbledash.core.presentation.designsystem.components.util.dropShadow
 import dev.gaddal.scribbledash.drawingCanvas.data.DefaultCanvasController
 import dev.gaddal.scribbledash.drawingCanvas.domain.CanvasController
 import dev.gaddal.scribbledash.drawingCanvas.presentation.CanvasControls
@@ -87,11 +87,15 @@ fun CanvasDrawingSection(
 
         Surface(
             modifier = Modifier
+                .dropShadow(
+                    shape = RoundedCornerShape(36.dp),
+                    blur = 24.dp,
+                    offsetY = 8.dp,
+                )
                 .aspectRatio(1f)
                 .size(354.dp),
             shape = RoundedCornerShape(36.dp),
             color = MaterialTheme.colorScheme.surface,
-            shadowElevation = 24.dp,
         ) {
             Box(
                 modifier = Modifier
@@ -153,18 +157,11 @@ fun CanvasDrawingSection(
                 showColorControls = false,
                 actionButton = {
                     // Done Button
-                    Surface(
-                        shape = RoundedCornerShape(20.dp),
-                        color = Color.Transparent,
-                        shadowElevation = 24.dp,
-                    ) {
-                        ScribbleDashButton(
-                            onClick = onDoneClick,
-                            enabled = state.paths.isNotEmpty(),
-                            modifier = Modifier.weight(1f),
-                            title = stringResource(R.string.done),
-                        )
-                    }
+                    ScribbleDashButton(
+                        onClick = onDoneClick,
+                        enabled = state.paths.isNotEmpty(),
+                        title = stringResource(R.string.done),
+                    )
                 }
             )
         }
