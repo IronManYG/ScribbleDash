@@ -71,7 +71,7 @@ fun ResultScreen(
                 if (referenceResId != null) {
                     Image(
                         painter = painterResource(id = referenceResId),
-                        contentDescription = "Reference drawing",
+                        contentDescription = stringResource(R.string.reference_drawing),
                         modifier = Modifier.matchParentSize(),
                         contentScale = ContentScale.Fit,
                     )
@@ -111,6 +111,8 @@ fun ResultScreen(
                 }
             }
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         // Feedback Message based on Score
         FeedbackSection(score = score?.toInt() ?: 0)

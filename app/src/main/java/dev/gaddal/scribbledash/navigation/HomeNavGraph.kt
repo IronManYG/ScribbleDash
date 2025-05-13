@@ -13,6 +13,7 @@ import dev.gaddal.scribbledash.core.domain.gameMode.GameMode
 import dev.gaddal.scribbledash.core.presentation.ui.navigation.HomeNavItem
 import dev.gaddal.scribbledash.core.presentation.ui.navigation.MainScreen
 import dev.gaddal.scribbledash.gameModes.oneRoundWonder.presentation.OneRoundWonderRoot
+import dev.gaddal.scribbledash.gameModes.speedDraw.presentation.SpeedDrawRoot
 import dev.gaddal.scribbledash.home.presentation.HomeRoot
 
 fun NavGraphBuilder.homeNavGraph(navController: NavHostController) {
@@ -37,12 +38,9 @@ fun NavGraphBuilder.homeNavGraph(navController: NavHostController) {
             )
         }
         composable<HomeNavItem.SpeedDraw> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(text = "Speed Draw")
-            }
+            SpeedDrawRoot(
+                onCloseClick = { navController.popBackStack() }
+            )
         }
         composable<HomeNavItem.EndlessMode> {
             Box(

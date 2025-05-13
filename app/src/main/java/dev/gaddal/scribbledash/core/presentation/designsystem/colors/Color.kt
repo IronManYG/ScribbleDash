@@ -31,4 +31,8 @@ object AppColors {
 
     val Shadow = Color(0xFF726558)
     val Shadow_SL12 = Shadow.copy(alpha = 0.12f) // Shadow / opacity - 0.08
+
+    // Gradient
+    // High score gradient
+    val HighScoreGradient = listOf(Color(0xFFFFDA35), Color(0xFFFF9600))
 }

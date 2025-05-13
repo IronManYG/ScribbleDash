@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package dev.gaddal.scribbledash.gameModes.oneRoundWonder.presentation
+package dev.gaddal.scribbledash.gameModes.speedDraw.presentation
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -8,6 +8,10 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -16,6 +20,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,24 +36,24 @@ import dev.gaddal.scribbledash.drawingCanvas.data.DefaultCanvasController
 import dev.gaddal.scribbledash.drawingCanvas.domain.CanvasController
 import dev.gaddal.scribbledash.gameModes.components.CanvasDrawingSection
 import dev.gaddal.scribbledash.gameModes.components.DifficultyLevel
-import dev.gaddal.scribbledash.gameModes.oneRoundWonder.presentation.components.ResultScreen
+import dev.gaddal.scribbledash.gameModes.components.DrawCounter
+import dev.gaddal.scribbledash.gameModes.components.HighScoreScreen
+import dev.gaddal.scribbledash.gameModes.speedDraw.presentation.components.TimerCircle
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun OneRoundWonderRoot(
+fun SpeedDrawRoot(
     onCloseClick: () -> Unit,
-    onLevelClick: () -> Unit,
-    viewModel: OneRoundWonderViewModel = koinViewModel()
+    viewModel: SpeedDrawViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    OneRoundWonderScreen(
+    SpeedDrawScreen(
         state = state,
         canvasController = viewModel.canvasManager,
         onAction = { action ->
             when (action) {
-                is OneRoundWonderAction.OnCloseClick -> onCloseClick()
-                is OneRoundWonderAction.OnLevelClick -> onLevelClick()
+                is SpeedDrawAction.OnCloseClick -> onCloseClick()
                 else -> Unit
             }
             viewModel.onAction(action)
@@ -57,10 +62,10 @@ fun OneRoundWonderRoot(
 }
 
 @Composable
-fun OneRoundWonderScreen(
-    state: OneRoundWonderState,
+fun SpeedDrawScreen(
+    state: SpeedDrawState,
     canvasController: CanvasController,
-    onAction: (OneRoundWonderAction) -> Unit,
+    onAction: (SpeedDrawAction) -> Unit,
 ) {
     val animationDuration = 300
 
@@ -71,10 +76,31 @@ fun OneRoundWonderScreen(
                 title = "",
                 showBackButton = false,
                 showSettingsButton = false,
+                optionalTitleContent = {
+                    if (state.level != null && !state.showResult) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            TimerCircle(
+                                remainingTimeInSeconds = state.remainingTimeInSeconds,
+                                isTimeLow = state.isTimeLow,
+                                onTimerComplete = { onAction(SpeedDrawAction.OnDoneClick) }
+                            )
+                            Spacer(modifier = Modifier.weight(1f))
+                            DrawCounter(
+                                count = state.drawCount.toString(),
+                                isNewHigh = false
+                            )
+                            Spacer(modifier = Modifier.weight(1f))
+                        }
+                    }
+                },
                 endContent = {
                     IconButton(
                         onClick = {
-                            onAction(OneRoundWonderAction.OnCloseClick)
+                            onAction(SpeedDrawAction.OnCloseClick)
                             canvasController.clearCanvas()
                         }
                     ) {
@@ -115,7 +141,7 @@ fun OneRoundWonderScreen(
             exit = slideOutAnimation
         ) {
             DifficultyLevel(
-                onLevelClick = { onAction(OneRoundWonderAction.OnLevelClick(it)) },
+                onLevelClick = { onAction(SpeedDrawAction.OnLevelClick(it)) },
                 modifier = Modifier.padding(innerPadding)
             )
         }
@@ -134,8 +160,18 @@ fun OneRoundWonderScreen(
                     canvasController = canvasController,
                     modifier = Modifier.padding(innerPadding),
                     referenceDrawingResId = state.referenceResId,
+                    secondToCountdown = 3,
                     strokeWidth = strokeWidth,
-                    onDoneClick = { onAction(OneRoundWonderAction.OnDoneClick) }
+                    countdownEnd = {
+                        if (!state.isTimerActive) {
+                            // First time - start the timer
+                            onAction(SpeedDrawAction.OnStartTimer)
+                        } else {
+                            // Subsequent examples - resume the timer
+                            onAction(SpeedDrawAction.OnResumeTimer)
+                        }
+                    },
+                    onDoneClick = { onAction(SpeedDrawAction.OnDoneClick) },
                 )
             }
 
@@ -144,34 +180,33 @@ fun OneRoundWonderScreen(
                 enter = slideInAnimation,
                 exit = slideOutAnimation
             ) {
-                ResultScreen(
-                    score = state.score,
-                    referenceResId = state.referenceResId,
-                    canvasController = canvasController,
-                    innerPadding = innerPadding,
-                    strokeWidth = strokeWidth,
-                    onTryAgainClick = {
-                        onAction(OneRoundWonderAction.OnTryAgainClick)
-                        canvasController.clearCanvas()
-                    }
+                HighScoreScreen(
+                    modifier = Modifier.padding(innerPadding),
+                    headerText = "Time's up!",
+                    scorePercentage = "${state.finalScore.toInt()}%",
+                    score = state.finalScore.toInt(),
+                    drawCount = state.drawCount.toString(),
+                    isNewHighScore = state.isNewHighScore,
+                    onDrawAgainClick = { onAction(SpeedDrawAction.OnDrawAgainClick) },
                 )
             }
+
         }
+
     }
 }
 
-
 @Preview
 @Composable
-private fun OneRoundWonderScreenPreview() {
+private fun Preview() {
     ScribbleDashTheme {
-        OneRoundWonderScreen(
-            state = OneRoundWonderState(
-                level = Level.Beginner
+        SpeedDrawScreen(
+            state = SpeedDrawState(
+                level = Level.Beginner,
+                showResult = false,
             ),
             canvasController = DefaultCanvasController(),
             onAction = {}
         )
     }
 }
-

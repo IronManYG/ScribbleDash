@@ -1,4 +1,4 @@
-package dev.gaddal.scribbledash.gameModes.oneRoundWonder.presentation.components
+package dev.gaddal.scribbledash.gameModes.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

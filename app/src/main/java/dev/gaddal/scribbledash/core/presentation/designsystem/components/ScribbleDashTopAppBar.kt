@@ -79,6 +79,7 @@ fun ScribbleDashTopAppBar(
     onBackClick: () -> Unit = {},
     onSettingsClick: () -> Unit = {},
     scrollBehavior: TopAppBarScrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(),
+    optionalTitleContent: (@Composable () -> Unit)? = null,
     startContent: (@Composable () -> Unit)? = null,
     endContent: (@Composable () -> Unit)? = null,
     isTitleCentered: Boolean = false,
@@ -89,26 +90,31 @@ fun ScribbleDashTopAppBar(
 
     TopAppBar(
         title = {
-            // Title row with conditional centering logic
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = if (isTitleCentered) Modifier.fillMaxWidth() else Modifier,
-                horizontalArrangement = if (isTitleCentered) Arrangement.Center else Arrangement.Start
-            ) {
-                // Optional start content with spacer
-                startContent?.let {
-                    it()
-                    Spacer(modifier = Modifier.width(8.dp))
-                }
+            // Optional title content
+            if (optionalTitleContent != null) {
+                optionalTitleContent()
+            } else {
+                // Title row with conditional centering logic
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = if (isTitleCentered) Modifier.fillMaxWidth() else Modifier,
+                    horizontalArrangement = if (isTitleCentered) Arrangement.Center else Arrangement.Start
+                ) {
+                    // Optional start content with spacer
+                    startContent?.let {
+                        it()
+                        Spacer(modifier = Modifier.width(8.dp))
+                    }
 
-                // Title text with custom styling
-                Text(
-                    text = title,
-                    style = titleTextStyle,
-                    overflow = TextOverflow.Ellipsis,
-                    softWrap = true,
-                    maxLines = 1,
-                )
+                    // Title text with custom styling
+                    Text(
+                        text = title,
+                        style = titleTextStyle,
+                        overflow = TextOverflow.Ellipsis,
+                        softWrap = true,
+                        maxLines = 1,
+                    )
+                }
             }
         },
         modifier = modifier,

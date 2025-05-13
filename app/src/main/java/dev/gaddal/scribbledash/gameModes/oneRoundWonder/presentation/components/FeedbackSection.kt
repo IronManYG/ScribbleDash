@@ -2,21 +2,26 @@ package dev.gaddal.scribbledash.gameModes.oneRoundWonder.presentation.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import dev.gaddal.scribbledash.R
 
 @Composable
-fun FeedbackSection(score: Int) {
+fun FeedbackSection(
+    modifier: Modifier = Modifier,
+    score: Int,
+    ratingTextColor: Color = MaterialTheme.colorScheme.onBackground,
+    feedbackTextColor: Color = MaterialTheme.colorScheme.onBackground,
+) {
     Column(
-        modifier = Modifier.padding(top = 16.dp),
+        modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -30,13 +35,13 @@ fun FeedbackSection(score: Int) {
 
         Text(
             text = ratingText,
-            color = MaterialTheme.colorScheme.onBackground,
+            color = ratingTextColor,
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.headlineLarge
         )
         Text(
             text = stringResource(feedbackResId),
-            color = MaterialTheme.colorScheme.onBackground,
+            color = feedbackTextColor,
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.bodyMedium
         )

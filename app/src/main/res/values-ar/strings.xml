@@ -67,4 +67,11 @@
     <string name="try_again">حاول مجدداً</string>
     <string name="stat_track_empty">لا يوجد شيء لتتبعه… حتى الآن</string>
     <string name="statistics">الإحصائيات</string>
+    <string name="speed_draw">الرسم السريع</string>
+    <string name="endless_mode">الوضع اللانهائي</string>
+    <string name="new_high">مستوى جديد!</string>
+    <string name="draw_again">ارسم مجدداً</string>
+    <string name="new_high_score">نتيجة عالية جديدة</string>
+    <string name="star">نجمة</string>
+    <string name="reference_drawing">رسم مرجعي</string>
 </resources>

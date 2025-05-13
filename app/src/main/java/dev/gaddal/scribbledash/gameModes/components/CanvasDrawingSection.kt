@@ -1,4 +1,4 @@
-package dev.gaddal.scribbledash.gameModes.oneRoundWonder.presentation.components
+package dev.gaddal.scribbledash.gameModes.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -50,22 +50,30 @@ fun CanvasDrawingSection(
     modifier: Modifier = Modifier,
     strokeWidth: Float,
     referenceDrawingResId: Int?,
-    onDoneClick: () -> Unit
+    secondToCountdown: Int = 5,
+    countdownEnd: (Boolean) -> Unit = {},
+    onDoneClick: () -> Unit,
 ) {
     val state by canvasController.canvasState.collectAsState()
 
     // Countdown state
-    var countdownSeconds by remember { mutableIntStateOf(5) }
-    var isCountdownActive by remember { mutableStateOf(true) }
+    var countdownSeconds by remember { mutableIntStateOf(secondToCountdown) }
+    var isShowingCountdown by remember { mutableStateOf(true) }
 
+    // Todo : fix this by removing it here or from viewModel
     // Timer effect
-    LaunchedEffect(key1 = Unit) {
+    LaunchedEffect(key1 = referenceDrawingResId) {
+        countdownSeconds = secondToCountdown
+        isShowingCountdown = true
+
         while (countdownSeconds > 0) {
             delay(1000L)
             countdownSeconds--
         }
-        isCountdownActive = false
+        isShowingCountdown = false
+        countdownEnd(false)
     }
+
 
     Column(
         modifier = modifier
@@ -76,7 +84,7 @@ fun CanvasDrawingSection(
     ) {
         // Title changes based on countdown state
         Text(
-            text = if (isCountdownActive) stringResource(R.string.ready_set) else stringResource(R.string.time_to_draw),
+            text = if (isShowingCountdown) stringResource(R.string.ready_set) else stringResource(R.string.time_to_draw),
             modifier = Modifier.padding(top = 32.dp),
             color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center,
@@ -116,17 +124,17 @@ fun CanvasDrawingSection(
                     canvasController = canvasController,
                     modifier = Modifier.fillMaxSize(),
                     strokeWidth = strokeWidth,
-                    touchEnabled = !isCountdownActive
+                    touchEnabled = !isShowingCountdown
                 )
 
                 // Reference drawing during countdown
-                if (referenceDrawingResId != null && isCountdownActive) {
+                if (referenceDrawingResId != null && isShowingCountdown) {
                     Image(
                         painter = painterResource(id = referenceDrawingResId),
-                        contentDescription = "Reference drawing",
+                        contentDescription = stringResource(R.string.reference_drawing),
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Fit,
-                        alpha = if (isCountdownActive) DefaultAlpha else 0.25f
+                        alpha = if (isShowingCountdown) DefaultAlpha else 0.25f
                     )
                 }
             }
@@ -135,7 +143,7 @@ fun CanvasDrawingSection(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = if (isCountdownActive) stringResource(R.string.example) else stringResource(R.string.your_drawing),
+            text = if (isShowingCountdown) stringResource(R.string.example) else stringResource(R.string.your_drawing),
             color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.labelSmall
@@ -144,7 +152,7 @@ fun CanvasDrawingSection(
         Spacer(modifier = Modifier.weight(1f))
 
         // Show countdown text or controls based on state
-        if (isCountdownActive) {
+        if (isShowingCountdown) {
             Text(
                 text = stringResource(R.string.seconds_left, countdownSeconds),
                 color = MaterialTheme.colorScheme.onBackground,

@@ -81,4 +81,9 @@
     <string name="statistics">Statistics</string>
     <string name="speed_draw">Speed Draw</string>
     <string name="endless_mode">Endless Mode</string>
+    <string name="new_high">NEW HIGH!</string>
+    <string name="draw_again">DRAW AGAIN</string>
+    <string name="new_high_score">New High Score</string>
+    <string name="star">Star</string>
+    <string name="reference_drawing">Reference drawing</string>
 </resources>
