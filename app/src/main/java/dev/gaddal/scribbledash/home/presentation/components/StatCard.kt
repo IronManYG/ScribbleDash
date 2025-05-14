@@ -13,8 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import dev.gaddal.scribbledash.core.presentation.designsystem.components.util.dropShadow
 
@@ -48,7 +47,7 @@ fun StatCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
-                imageVector = ImageVector.vectorResource(id = iconResId),
+                painter = painterResource(id = iconResId),
                 contentDescription = null,
                 alignment = Alignment.CenterEnd,
                 modifier = Modifier.size(52.dp)

@@ -2,7 +2,9 @@ package dev.gaddal.scribbledash.gameModes.speedDraw.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dev.gaddal.scribbledash.core.domain.gameMode.GameMode
 import dev.gaddal.scribbledash.core.domain.gameMode.Level
+import dev.gaddal.scribbledash.core.domain.statistics.StatisticsPreferences
 import dev.gaddal.scribbledash.drawingCanvas.data.DrawingRepository
 import dev.gaddal.scribbledash.drawingCanvas.data.ExampleDrawing
 import dev.gaddal.scribbledash.drawingCanvas.domain.CanvasController
@@ -17,14 +19,15 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class SpeedDrawViewModel(
     private val canvasController: CanvasController,
     private val repo: DrawingRepository,
     private val engine: PathComparisonEngine,
+    private val statisticsPreferences: StatisticsPreferences,
 ) : ViewModel() {
 
     val canvasManager: CanvasController = canvasController
@@ -35,7 +38,8 @@ class SpeedDrawViewModel(
 
     private var hasLoadedInitialData = false
 
-    private val _previousHighScore = MutableStateFlow(0)
+    private val _previousHighDrawCount = MutableStateFlow(0)
+    private val _previousHighestAccuracy = MutableStateFlow(0f)
 
     // List of drawings to cycle through/
     private var drawingsList: List<ExampleDrawing> = emptyList()
@@ -48,7 +52,7 @@ class SpeedDrawViewModel(
             if (!hasLoadedInitialData) {
                 /** Load initial data here **/
                 observeTimerTracker()
-                loadHighScore()
+                fetchStatistics()
                 hasLoadedInitialData = true
             }
         }
@@ -67,6 +71,24 @@ class SpeedDrawViewModel(
             SpeedDrawAction.OnStartTimer -> handleStartTimer()
             SpeedDrawAction.OnResumeTimer -> handleResumeTimer()
         }
+    }
+
+    private fun fetchStatistics() {
+        statisticsPreferences
+            .observeMostDrawingsCompleted(mode = GameMode.SpeedDraw)
+            .take(1)
+            .onEach { mostDrawingsCompleted ->
+                _previousHighDrawCount.value = mostDrawingsCompleted
+            }
+            .launchIn(viewModelScope)
+
+        statisticsPreferences
+            .observeHighestAccuracy(mode = GameMode.SpeedDraw)
+            .take(1)
+            .onEach { highestAccuracy ->
+                _previousHighestAccuracy.value = highestAccuracy
+            }
+            .launchIn(viewModelScope)
     }
 
     private fun observeTimerTracker() {
@@ -140,14 +162,30 @@ class SpeedDrawViewModel(
         _state.update {
             it.copy(
                 showResult = true,
-                isNewHighScore = it.drawCount > _previousHighScore.value
+                isNewHighScore = it.drawCount > _previousHighDrawCount.value
             )
         }
 
-        // Save high score if needed
-        if (_state.value.drawCount > _previousHighScore.value) {
-            _previousHighScore.value = _state.value.drawCount
-            saveHighScore(_state.value.drawCount)
+        // Save high draw count if needed
+        if (_state.value.drawCount > _previousHighDrawCount.value) {
+            _previousHighDrawCount.value = _state.value.drawCount
+            viewModelScope.launch {
+                statisticsPreferences.saveMostDrawingsCompleted(
+                    mode = GameMode.SpeedDraw,
+                    count = _state.value.drawCount
+                )
+            }
+        }
+
+        // Save highest accuracy if needed
+        if (_state.value.finalScore > _previousHighestAccuracy.value) {
+            _previousHighestAccuracy.value = _state.value.finalScore
+            viewModelScope.launch {
+                statisticsPreferences.saveHighestAccuracy(
+                    mode = GameMode.SpeedDraw,
+                    accuracy = _state.value.finalScore
+                )
+            }
         }
     }
 
@@ -251,19 +289,5 @@ class SpeedDrawViewModel(
         canvasManager.clearCanvas()
         currentDrawingIndex = (currentDrawingIndex + 1) % drawingsList.size
         showNextDrawing()
-    }
-
-    private fun loadHighScore() {
-        // For testing purposes, we're just initializing with a value
-        // In a real implementation, you would load from preferences
-        _previousHighScore.value = 0
-    }
-
-    private fun saveHighScore(score: Int) {
-        // For testing purposes, just update the state
-        _previousHighScore.value = score
-
-        // Log the saved score for verification
-        Timber.tag("SpeedDrawViewModel").d("High score saved: $score")
     }
 }

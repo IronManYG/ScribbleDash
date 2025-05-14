@@ -2,13 +2,20 @@ package dev.gaddal.scribbledash.home.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dev.gaddal.scribbledash.core.domain.gameMode.GameMode
+import dev.gaddal.scribbledash.core.domain.statistics.StatisticsPreferences
 import dev.gaddal.scribbledash.core.presentation.ui.navigation.HomeNavItem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 
-class HomeViewModel() : ViewModel() {
+class HomeViewModel(
+    private val statisticsPreferences: StatisticsPreferences,
+) : ViewModel() {
 
     private var hasLoadedInitialData = false
 
@@ -17,6 +24,7 @@ class HomeViewModel() : ViewModel() {
         .onStart {
             if (!hasLoadedInitialData) {
                 // Load initial data here
+                observeStatistics()
                 hasLoadedInitialData = true
             }
         }
@@ -42,6 +50,24 @@ class HomeViewModel() : ViewModel() {
 
             else -> {}
         }
+    }
+
+    private fun observeStatistics() {
+        combine(
+            statisticsPreferences.observeHighestAccuracy(GameMode.SpeedDraw),
+            statisticsPreferences.observeMostDrawingsCompleted(GameMode.SpeedDraw),
+            statisticsPreferences.observeHighestAccuracy(GameMode.EndlessMode),
+            statisticsPreferences.observeMostDrawingsCompleted(GameMode.EndlessMode),
+        ) { highestAccuracySpeedDraw, mostDrawingsCompletedSpeedDraw, highestAccuracyEndlessMode, mostDrawingsCompletedEndlessMode ->
+            _state.update {
+                it.copy(
+                    highestAccuracySpeedDraw = highestAccuracySpeedDraw,
+                    mostDrawingsCompletedSpeedDraw = mostDrawingsCompletedSpeedDraw,
+                    highestAccuracyEndlessMode = highestAccuracyEndlessMode,
+                    mostDrawingsCompletedEndlessMode = mostDrawingsCompletedEndlessMode
+                )
+            }
+        }.launchIn(viewModelScope)
     }
 
 }

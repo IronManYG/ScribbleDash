@@ -105,6 +105,7 @@ fun HomeScreen(
             ) {
                 // Chart
                 ChartSection(
+                    state = state,
                     modifier = Modifier
                         .padding(innerPadding)
                         .fillMaxSize(),

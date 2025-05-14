@@ -62,6 +62,9 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
 
+    // DataStore
+    implementation(libs.androidx.datastore)
+
     // Koin
     implementation(libs.bundles.koin.compose)
 
