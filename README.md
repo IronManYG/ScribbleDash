@@ -13,41 +13,45 @@
 
 ## Overview
 
-**ScribbleDash** is an Android app designed to let you freely draw on a digital canvas while incorporating fun game modes. Whether you want to doodle casually or challenge yourself with specific modes, you’ll have access to intuitive undo/redo controls, a clean canvas, and a simple UI. Also its lets you draw on a digital canvas and compete in fast **memory‑sketch** rounds. With **Milestone 2** the project evolves from a sandbox into a fully scored game loop:
+**ScribbleDash** is an Android app that began as a simple drawing playground and has grown—by **Milestone 3**—into a mini‑arcade of sketch‑based challenges. Whether you doodle casually or battle the clock, you’ll find intuitive undo/redo controls, a clean canvas, and three distinct game modes:
 
-1. Pick **One Round Wonder** on the Home screen.
-2. Choose a difficulty (brush thickness scales with difficulty).
-3. Memorize the reference image shown during a 3‑second countdown.
-4. Redraw the image from memory.
-5. Tap **Done**—a pixel‑by‑pixel comparison algorithm rates your accuracy.
-6. View your score, read playful feedback, and dive right back in.
+* **One Round Wonder** – one drawing, one score.
+* **Speed Draw** – cram as many decent sketches as you can into two minutes.
+* **Endless Mode** – keep going until your last drawing falls below *Good* quality.
 
 ## Features
 
-### Home Screen
+### Home Screen&#x20;
 
-* App title and list of available modes.
+* App title and  List of game‑mode cards (**One Round Wonder, Speed Draw, Endless Mode**).
 * Bottom navigation with **Home** and **Statistics**.
 
-### Statistics Screen *(new in Milestone 2)*
+### Statistics Screen *(dynamic in Milestone 3)*
 
-* Static mock‑up that will evolve into full leaderboards.
-* Placeholder cards for score history and accuracy distribution.
+* Shows personal bests collected across sessions:
+
+  * Highest **Speed Draw** accuracy %.
+  * Most Meh+ drawings in **Speed Draw**.
+  * Highest **Endless Mode** accuracy %.
+  * Most drawings completed in **Endless Mode**.
+
 
 ### Game Modes
 
-| Mode                 | Highlights in Milestone 2                                                                                                                                                                                                                                                                                            |
-| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **One Round Wonder** | • Difficulty picker (Beginner ×15, Challenging ×7, Master ×4).• **Preview**—fullscreen reference with “Ready, set …” countdown.• **Draw Mode**—1 : 1 grid canvas, undo/redo stack (×5), **Done** button.• **Results**—side‑by‑side canvases, score %, rating badge (Oops → Woohoo!), random feedback, **Try Again**. |
+| Mode                 | Core Loop & Highlights                                                                                                                                                                                                                                                                                                                                          |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **One Round Wonder** | *Pick difficulty → 3‑sec preview → draw from memory → see score & feedback.* Same flow as Milestone 2, still the yard‑stick for single‑shot accuracy.                                                                                                                                                                                                           |
+| **Speed Draw**       | *2‑minute timer* (pauses while preview is shown). Counter increments when a finished drawing scores **Meh (≥40 %)** or better. Instant background comparison so the game never stutters. When time’s up you see an averaged accuracy %, the total valid drawings, and shiny **New High Score** banners if you beat yourself. **Draw Again!** restarts the mode. |
+| **Endless Mode**     | Draw until you stumble: each finished sketch must score **Good (≥70 %)** or better. Results screen shows green ✓ / red ✗ indicator. **Next Drawing** keeps the streak alive; **Finish** ends the run and shows a *Game over!* summary with average accuracy and total drawings.  
 
-> Additional modes will live under `features/gamemodes/*` without impacting existing code.
+### Drawing Canvas (shared mechanics)
 
-### Drawing Canvas
-
-* Fixed 1 : 1 surface with a nine‑square grid background.
-* Default stroke width = 4 dp (scaled only for comparison).
-* Undo ⟲ / Redo ⟳ (up to 5), Clear, and **Done**.
-* Close icon returns to Home—system‑back is disabled on the Results screen.
+* 1 : 1 grid canvas with rounded corners.
+* Stroke width = 4 dp (scaled internally for scoring).
+* **Undo / Redo** up to 5 strokes.
+* **Clear** (or **Done** in draw‑modes).
+* Close icon returns to Home; system‑back is disabled on result screens.
+* **Speed Draw** overlay: visible round timer (turns red ≤ 30 s) and completed‑drawings counter.
 
 ### Accuracy Algorithm
 
@@ -77,6 +81,8 @@ Final Score (%) = Coverage (%) − MissingLengthPenalty (%)
 | **Home Screen** | ![Home Preview](previews/Home.png)  |
 | **Difficulty Screen** | ![Difficulty](previews/Difficulty.png)|
 | **Drawing Canvas** | ![Drawing](previews/Drawing.png)    |
+| **Speed Draw – Timer**    |         |
+| **Endless Mode – Result** |         |
 
 ## Tech Stack & Libraries
 
@@ -108,10 +114,8 @@ scribbledash/
 │   │   │   ├── data/
 │   │   │   ├── domain/
 │   │   │   └── presentation/
-│   │   └── (future_mode)/
-│   │       ├── data/
-│   │       ├── domain/
-│   │       └── presentation/
+│   │   ├── speeddraw/
+│   │   └── endless/
 │   └── draw/
 │       ├── data/
 │       ├── domain/
@@ -144,3 +148,4 @@ This project was built as part of the **[Pl Mobile Dev Campus](https://pl-coding
 If you have any questions or suggestions, please get in touch with me or open an issue.
 
 Happy Scribbling!
+
