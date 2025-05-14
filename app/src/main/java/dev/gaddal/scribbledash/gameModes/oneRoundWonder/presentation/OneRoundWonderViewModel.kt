@@ -8,7 +8,7 @@ import dev.gaddal.scribbledash.drawingCanvas.data.ExampleDrawing
 import dev.gaddal.scribbledash.drawingCanvas.domain.CanvasController
 import dev.gaddal.scribbledash.drawingCanvas.domain.PathComparisonEngine
 import dev.gaddal.scribbledash.drawingCanvas.domain.PathComparisonEngine.Difficulty
-import dev.gaddal.scribbledash.gameModes.oneRoundWonder.presentation.components.CANVAS_SIZE_PX
+import dev.gaddal.scribbledash.gameModes.components.CANVAS_SIZE_PX
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onStart

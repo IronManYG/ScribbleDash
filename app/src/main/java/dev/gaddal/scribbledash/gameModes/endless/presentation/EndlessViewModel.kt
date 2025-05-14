@@ -1,4 +1,4 @@
-package dev.gaddal.scribbledash.gameModes.speedDraw.presentation
+package dev.gaddal.scribbledash.gameModes.endless.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,7 +11,6 @@ import dev.gaddal.scribbledash.drawingCanvas.domain.CanvasController
 import dev.gaddal.scribbledash.drawingCanvas.domain.PathComparisonEngine
 import dev.gaddal.scribbledash.drawingCanvas.domain.PathComparisonEngine.Difficulty
 import dev.gaddal.scribbledash.gameModes.components.CANVAS_SIZE_PX
-import dev.gaddal.scribbledash.gameModes.speedDraw.domain.SpeedDrawTimerTracker
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -22,8 +21,9 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
-class SpeedDrawViewModel(
+class EndlessViewModel(
     private val canvasController: CanvasController,
     private val repo: DrawingRepository,
     private val engine: PathComparisonEngine,
@@ -31,10 +31,6 @@ class SpeedDrawViewModel(
 ) : ViewModel() {
 
     val canvasManager: CanvasController = canvasController
-    private val timerTracker = SpeedDrawTimerTracker(
-        applicationScope = viewModelScope,
-        onTimerComplete = ::handleTimerComplete,
-    )
 
     private var hasLoadedInitialData = false
 
@@ -46,12 +42,11 @@ class SpeedDrawViewModel(
     private var currentDrawingIndex = 0
     private var isProcessingComparison = false
 
-    private val _state = MutableStateFlow(SpeedDrawState())
+    private val _state = MutableStateFlow(EndlessState())
     val state = _state
         .onStart {
             if (!hasLoadedInitialData) {
                 /** Load initial data here **/
-                observeTimerTracker()
                 fetchStatistics()
                 hasLoadedInitialData = true
             }
@@ -59,23 +54,23 @@ class SpeedDrawViewModel(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000L),
-            initialValue = SpeedDrawState()
+            initialValue = EndlessState()
         )
 
-    fun onAction(action: SpeedDrawAction) {
+    fun onAction(action: EndlessAction) {
         when (action) {
-            SpeedDrawAction.OnCloseClick -> handleCloseClick()
-            is SpeedDrawAction.OnLevelClick -> handleLevelClick(action.level)
-            SpeedDrawAction.OnDoneClick -> handleDoneClick()
-            SpeedDrawAction.OnDrawAgainClick -> handleDrawAgainClick()
-            SpeedDrawAction.OnStartTimer -> handleStartTimer()
-            SpeedDrawAction.OnResumeTimer -> handleResumeTimer()
+            EndlessAction.OnCloseClick -> handleCloseClick()
+            is EndlessAction.OnLevelClick -> handleLevelClick(action.level)
+            EndlessAction.OnDoneClick -> handleDoneClick()
+            EndlessAction.OnNextDrawingClick -> handleNextDrawingClick()
+            EndlessAction.OnFinishClick -> handleFinishClick()
+            EndlessAction.OnDrawAgainClick -> handleDrawAgainClick()
         }
     }
 
     private fun fetchStatistics() {
         statisticsPreferences
-            .observeMostDrawingsCompleted(mode = GameMode.SpeedDraw)
+            .observeMostDrawingsCompleted(mode = GameMode.EndlessMode)
             .take(1)
             .onEach { mostDrawingsCompleted ->
                 _previousHighDrawCount.value = mostDrawingsCompleted
@@ -83,7 +78,7 @@ class SpeedDrawViewModel(
             .launchIn(viewModelScope)
 
         statisticsPreferences
-            .observeHighestAccuracy(mode = GameMode.SpeedDraw)
+            .observeHighestAccuracy(mode = GameMode.EndlessMode)
             .take(1)
             .onEach { highestAccuracy ->
                 _previousHighestAccuracy.value = highestAccuracy
@@ -91,36 +86,8 @@ class SpeedDrawViewModel(
             .launchIn(viewModelScope)
     }
 
-    private fun observeTimerTracker() {
-        timerTracker.isActive
-            .onEach { isActive ->
-                _state.update { it.copy(isTimerActive = isActive) }
-            }
-            .launchIn(viewModelScope)
-
-        timerTracker.isPaused
-            .onEach { paused ->
-                _state.update { it.copy(isTimerPaused = paused) }
-            }
-            .launchIn(viewModelScope)
-
-        timerTracker.remainingTimeInSeconds
-            .onEach { remainingTime ->
-                _state.update { it.copy(remainingTimeInSeconds = remainingTime) }
-            }
-            .launchIn(viewModelScope)
-
-
-        timerTracker.isTimeLow
-            .onEach { isTimeLow ->
-                _state.update { it.copy(isTimeLow = isTimeLow) }
-            }
-            .launchIn(viewModelScope)
-    }
-
     private fun handleCloseClick() {
-        _state.update { it.copy(showResult = false) }
-        timerTracker.stopTimer()
+        _state.update { it.copy(showLastDrawingResult = false) }
         canvasController.clearCanvas()
     }
 
@@ -131,47 +98,24 @@ class SpeedDrawViewModel(
 
     private fun handleDoneClick() {
         if (_state.value.isShowingExample) return
-
-        if (_state.value.remainingTimeInSeconds <= 0) {
-            showResults()
-        } else {
-            processDrawing()
-        }
+        processDrawing()
     }
 
-    private fun handleDrawAgainClick() {
-        canvasController.clearCanvas()
-        _state.value = SpeedDrawState()
-        timerTracker.stopTimer()
-        timerTracker.resetTimer()
+    private fun handleNextDrawingClick() {
+        // Proceed to next drawing immediately
+        advanceToNextDrawing()
+        _state.update { it.copy(showLastDrawingResult = false) }
     }
 
-    private fun handleStartTimer() {
-        timerTracker.startTimer(resetTime = true)
-    }
-
-    private fun handleResumeTimer() {
-        timerTracker.resumeTimer()
-    }
-
-    private fun handleTimerComplete() {
-        showResults()
-    }
-
-    private fun showResults() {
-        _state.update {
-            it.copy(
-                showResult = true,
-                isNewHighScore = it.drawCount > _previousHighDrawCount.value
-            )
-        }
+    private fun handleFinishClick() {
+        _state.update { it.copy(showLastDrawingResult = false, showHighScoreResult = true) }
 
         // Save high draw count if needed
         if (_state.value.drawCount > _previousHighDrawCount.value) {
             _previousHighDrawCount.value = _state.value.drawCount
             viewModelScope.launch {
                 statisticsPreferences.saveMostDrawingsCompleted(
-                    mode = GameMode.SpeedDraw,
+                    mode = GameMode.EndlessMode,
                     count = _state.value.drawCount
                 )
             }
@@ -182,10 +126,29 @@ class SpeedDrawViewModel(
             _previousHighestAccuracy.value = _state.value.finalScore
             viewModelScope.launch {
                 statisticsPreferences.saveHighestAccuracy(
-                    mode = GameMode.SpeedDraw,
+                    mode = GameMode.EndlessMode,
                     accuracy = _state.value.finalScore
                 )
             }
+        }
+    }
+
+    private fun handleDrawAgainClick() {
+        canvasController.clearCanvas()
+        _state.value = EndlessState()
+    }
+
+    private fun showResults() {
+        val isNewHighScore = _state.value.drawCount > _previousHighDrawCount.value
+        Timber.tag("EndlessViewModel").d("drawCount: ${_state.value.drawCount}")
+        Timber.tag("EndlessViewModel").d("previousHighDrawCount: ${_previousHighDrawCount.value}")
+        Timber.tag("EndlessViewModel").d("isNewHighScore: $isNewHighScore")
+
+        _state.update {
+            it.copy(
+                showLastDrawingResult = true,
+                isNewHighScore = isNewHighScore
+            )
         }
     }
 
@@ -208,9 +171,6 @@ class SpeedDrawViewModel(
             )
         }
 
-        // Pause the timer during example display
-        timerTracker.pauseTimer()
-
         // Todo : fix this by removing it here or from canvasDrawingSection
         // Start countdown for example display
         viewModelScope.launch {
@@ -224,10 +184,7 @@ class SpeedDrawViewModel(
                     exampleCountdown = 0
                 )
             }
-            // Resume timer when example display ends
-            if (_state.value.isTimerActive) {
-                timerTracker.resumeTimer()
-            }
+
         }
     }
 
@@ -237,9 +194,6 @@ class SpeedDrawViewModel(
 
         val example = drawingsList[currentDrawingIndex]
         val paths = canvasManager.canvasState.value.paths
-
-        // Proceed to next drawing immediately
-        advanceToNextDrawing()
 
         // Process comparison in background
         viewModelScope.launch {
@@ -253,12 +207,18 @@ class SpeedDrawViewModel(
                 userStroke = 10f
             )
 
-            // Increment counter if score is at least 40%
-            if (score >= 40f) {
+            // 1. Update lastDrawingScore in state
+            _state.update { it.copy(lastDrawingScore = score) }
+
+            // Increment counter if score is at least 70%
+            if (score >= 70f) {
                 updateScores(score)
             }
 
             isProcessingComparison = false
+
+            // 3. Trigger showing the ResultScreen
+            showResults()
         }
     }
 
@@ -290,4 +250,5 @@ class SpeedDrawViewModel(
         currentDrawingIndex = (currentDrawingIndex + 1) % drawingsList.size
         showNextDrawing()
     }
+
 }

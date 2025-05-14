@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package dev.gaddal.scribbledash.gameModes.speedDraw.presentation
+package dev.gaddal.scribbledash.gameModes.endless.presentation
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -30,6 +30,7 @@ import dev.gaddal.scribbledash.R
 import dev.gaddal.scribbledash.core.domain.gameMode.Level
 import dev.gaddal.scribbledash.core.presentation.designsystem.AppIcons
 import dev.gaddal.scribbledash.core.presentation.designsystem.ScribbleDashTheme
+import dev.gaddal.scribbledash.core.presentation.designsystem.components.ScribbleDashButton
 import dev.gaddal.scribbledash.core.presentation.designsystem.components.ScribbleDashScaffold
 import dev.gaddal.scribbledash.core.presentation.designsystem.components.ScribbleDashTopAppBar
 import dev.gaddal.scribbledash.drawingCanvas.data.DefaultCanvasController
@@ -38,22 +39,22 @@ import dev.gaddal.scribbledash.gameModes.components.CanvasDrawingSection
 import dev.gaddal.scribbledash.gameModes.components.DifficultyLevel
 import dev.gaddal.scribbledash.gameModes.components.DrawCounter
 import dev.gaddal.scribbledash.gameModes.components.HighScoreScreen
-import dev.gaddal.scribbledash.gameModes.speedDraw.presentation.components.TimerCircle
+import dev.gaddal.scribbledash.gameModes.components.ResultScreen
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun SpeedDrawRoot(
+fun EndlessRoot(
     onCloseClick: () -> Unit,
-    viewModel: SpeedDrawViewModel = koinViewModel()
+    viewModel: EndlessViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    SpeedDrawScreen(
+    EndlessScreen(
         state = state,
         canvasController = viewModel.canvasManager,
         onAction = { action ->
             when (action) {
-                is SpeedDrawAction.OnCloseClick -> onCloseClick()
+                is EndlessAction.OnCloseClick -> onCloseClick()
                 else -> Unit
             }
             viewModel.onAction(action)
@@ -62,10 +63,10 @@ fun SpeedDrawRoot(
 }
 
 @Composable
-fun SpeedDrawScreen(
-    state: SpeedDrawState,
+fun EndlessScreen(
+    state: EndlessState,
     canvasController: CanvasController,
-    onAction: (SpeedDrawAction) -> Unit,
+    onAction: (EndlessAction) -> Unit,
 ) {
     val animationDuration = 300
 
@@ -77,17 +78,12 @@ fun SpeedDrawScreen(
                 showBackButton = false,
                 showSettingsButton = false,
                 optionalTitleContent = {
-                    if (state.level != null && !state.showResult) {
+                    if (state.level != null && !state.showHighScoreResult) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
                         ) {
-                            TimerCircle(
-                                remainingTimeInSeconds = state.remainingTimeInSeconds,
-                                isTimeLow = state.isTimeLow,
-                                onTimerComplete = { onAction(SpeedDrawAction.OnDoneClick) }
-                            )
                             Spacer(modifier = Modifier.weight(1f))
                             DrawCounter(
                                 count = state.drawCount.toString(),
@@ -100,7 +96,7 @@ fun SpeedDrawScreen(
                 endContent = {
                     IconButton(
                         onClick = {
-                            onAction(SpeedDrawAction.OnCloseClick)
+                            onAction(EndlessAction.OnCloseClick)
                             canvasController.clearCanvas()
                         }
                     ) {
@@ -141,7 +137,7 @@ fun SpeedDrawScreen(
             exit = slideOutAnimation
         ) {
             DifficultyLevel(
-                onLevelClick = { onAction(SpeedDrawAction.OnLevelClick(it)) },
+                onLevelClick = { onAction(EndlessAction.OnLevelClick(it)) },
                 modifier = Modifier.padding(innerPadding)
             )
         }
@@ -152,7 +148,7 @@ fun SpeedDrawScreen(
             exit = slideOutAnimation
         ) {
             AnimatedVisibility(
-                visible = !state.showResult,
+                visible = !state.showLastDrawingResult && !state.showHighScoreResult,
                 enter = slideInAnimation,
                 exit = slideOutAnimation
             ) {
@@ -162,35 +158,67 @@ fun SpeedDrawScreen(
                     referenceDrawingResId = state.referenceResId,
                     secondToCountdown = 3,
                     strokeWidth = strokeWidth,
-                    countdownEnd = {
-                        if (!state.isTimerActive) {
-                            // First time - start the timer
-                            onAction(SpeedDrawAction.OnStartTimer)
-                        } else {
-                            // Subsequent examples - resume the timer
-                            onAction(SpeedDrawAction.OnResumeTimer)
-                        }
-                    },
-                    onDoneClick = { onAction(SpeedDrawAction.OnDoneClick) },
+                    countdownEnd = {},
+                    onDoneClick = { onAction(EndlessAction.OnDoneClick) },
                 )
             }
 
             AnimatedVisibility(
-                visible = state.showResult,
+                visible = state.showLastDrawingResult,
+                enter = slideInAnimation,
+                exit = slideOutAnimation
+            ) {
+                ResultScreen(
+                    score = state.lastDrawingScore,
+                    referenceResId = state.referenceResId,
+                    canvasController = canvasController,
+                    innerPadding = innerPadding,
+                    strokeWidth = strokeWidth,
+                    showScoreBadge = true,
+                    buttonsContent = {
+                        ScribbleDashButton(
+                            onClick = {
+                                onAction(EndlessAction.OnFinishClick)
+                                canvasController.clearCanvas()
+                            },
+                            enabled = true,
+                            modifier = Modifier.fillMaxWidth(),
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            title = stringResource(R.string.finish),
+                        )
+
+                        if (state.lastDrawingScore >= 70f) {
+                            Spacer(modifier = Modifier.size(8.dp))
+
+                            ScribbleDashButton(
+                                onClick = {
+                                    onAction(EndlessAction.OnNextDrawingClick)
+                                    canvasController.clearCanvas()
+                                },
+                                enabled = true,
+                                modifier = Modifier.fillMaxWidth(),
+                                title = stringResource(R.string.next_drawing),
+                            )
+                        }
+                    }
+                )
+            }
+
+            AnimatedVisibility(
+                visible = state.showHighScoreResult,
                 enter = slideInAnimation,
                 exit = slideOutAnimation
             ) {
                 HighScoreScreen(
                     modifier = Modifier.padding(innerPadding),
-                    headerText = stringResource(R.string.times_up),
+                    headerText = stringResource(R.string.game_over),
                     scorePercentage = "${state.finalScore.toInt()}%",
                     score = state.finalScore.toInt(),
                     drawCount = state.drawCount.toString(),
                     isNewHighScore = state.isNewHighScore,
-                    onDrawAgainClick = { onAction(SpeedDrawAction.OnDrawAgainClick) },
+                    onDrawAgainClick = { onAction(EndlessAction.OnDrawAgainClick) },
                 )
             }
-
         }
 
     }
@@ -200,10 +228,11 @@ fun SpeedDrawScreen(
 @Composable
 private fun Preview() {
     ScribbleDashTheme {
-        SpeedDrawScreen(
-            state = SpeedDrawState(
+        EndlessScreen(
+            state = EndlessState(
                 level = Level.Beginner,
-                showResult = false,
+                showLastDrawingResult = true,
+                lastDrawingScore = 30f,
             ),
             canvasController = DefaultCanvasController(),
             onAction = {}

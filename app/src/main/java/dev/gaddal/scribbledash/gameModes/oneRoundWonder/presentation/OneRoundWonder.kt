@@ -8,6 +8,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -25,13 +26,14 @@ import dev.gaddal.scribbledash.R
 import dev.gaddal.scribbledash.core.domain.gameMode.Level
 import dev.gaddal.scribbledash.core.presentation.designsystem.AppIcons
 import dev.gaddal.scribbledash.core.presentation.designsystem.ScribbleDashTheme
+import dev.gaddal.scribbledash.core.presentation.designsystem.components.ScribbleDashButton
 import dev.gaddal.scribbledash.core.presentation.designsystem.components.ScribbleDashScaffold
 import dev.gaddal.scribbledash.core.presentation.designsystem.components.ScribbleDashTopAppBar
 import dev.gaddal.scribbledash.drawingCanvas.data.DefaultCanvasController
 import dev.gaddal.scribbledash.drawingCanvas.domain.CanvasController
 import dev.gaddal.scribbledash.gameModes.components.CanvasDrawingSection
 import dev.gaddal.scribbledash.gameModes.components.DifficultyLevel
-import dev.gaddal.scribbledash.gameModes.oneRoundWonder.presentation.components.ResultScreen
+import dev.gaddal.scribbledash.gameModes.components.ResultScreen
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -150,9 +152,17 @@ fun OneRoundWonderScreen(
                     canvasController = canvasController,
                     innerPadding = innerPadding,
                     strokeWidth = strokeWidth,
-                    onTryAgainClick = {
-                        onAction(OneRoundWonderAction.OnTryAgainClick)
-                        canvasController.clearCanvas()
+                    buttonsContent = {
+                        ScribbleDashButton(
+                            onClick = {
+                                onAction(OneRoundWonderAction.OnTryAgainClick)
+                                canvasController.clearCanvas()
+                            },
+                            enabled = true,
+                            modifier = Modifier.fillMaxWidth(),
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            title = stringResource(R.string.try_again),
+                        )
                     }
                 )
             }

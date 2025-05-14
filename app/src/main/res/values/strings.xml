@@ -65,7 +65,7 @@
     <string name="feedback_woohoo_10">Is there a gallery nearby? Because this masterpiece needs to be on display!</string>
 
     <string name="clear_canvas">Clear Canvas</string>
-    <string name="ready_set">Ready, set...</string>
+    <string name="ready_set">Ready, set…</string>
     <string name="example">Example</string>
     <string name="your_drawing">Your Drawing</string>
     <string name="seconds_left">%1$s seconds left</string>
@@ -86,4 +86,8 @@
     <string name="new_high_score">New High Score</string>
     <string name="star">Star</string>
     <string name="reference_drawing">Reference drawing</string>
+    <string name="times_up">Time\'s up!</string>
+    <string name="finish">FINISH</string>
+    <string name="next_drawing">NEXT DRAWING</string>
+    <string name="game_over">Game over!</string>
 </resources>

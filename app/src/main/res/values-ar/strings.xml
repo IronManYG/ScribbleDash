@@ -74,4 +74,8 @@
     <string name="new_high_score">نتيجة عالية جديدة</string>
     <string name="star">نجمة</string>
     <string name="reference_drawing">رسم مرجعي</string>
+    <string name="times_up">انتهى الوقت!</string>
+    <string name="finish">إنهاء</string>
+    <string name="next_drawing">الرسمة التالية</string>
+    <string name="game_over">انتهت اللعبة!</string>
 </resources>
